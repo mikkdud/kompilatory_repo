@@ -1,150 +1,125 @@
-#######################################
-# CONSTANTS
-#######################################
+CYFRY = '0123456789'
 
-DIGITS = '0123456789'
-
-#######################################
-# ERRORS
-#######################################
-
-class Error:
-    def __init__(self, pos_start, pos_end, error_name, details):
-        self.pos_start = pos_start
-        self.pos_end = pos_end
-        self.error_name = error_name
-        self.details = details
+class Blad:
+    def __init__(self, poczatek, koniec, nazwa_bledu, szczegoly):
+        self.poczatek = poczatek
+        self.koniec = koniec
+        self.nazwa_bledu = nazwa_bledu
+        self.szczegoly = szczegoly
     
-    def as_string(self):
-        result  = f'{self.error_name}: {self.details}\n'
-        result += f'File {self.pos_start.fn}, line {self.pos_start.ln + 1}'
-        return result
+    def jako_tekst(self):
+        wynik  = f'{self.nazwa_bledu}: {self.szczegoly}\n'
+        wynik += f'Plik {self.poczatek.nazwa_pliku}, linia {self.poczatek.nr_linii + 1}'
+        return wynik
 
-class IllegalCharError(Error):
-    def __init__(self, pos_start, pos_end, details):
-        super().__init__(pos_start, pos_end, 'Illegal Character', details)
+class NiedozwolonyZnakBlad(Blad):
+    def __init__(self, poczatek, koniec, szczegoly):
+        super().__init__(poczatek, koniec, 'Niedozwolony znak', szczegoly)
 
-#######################################
-# POSITION
-#######################################
 
-class Position:
-    def __init__(self, idx, ln, col, fn, ftxt):
-        self.idx = idx
-        self.ln = ln
-        self.col = col
-        self.fn = fn
-        self.ftxt = ftxt
+class Pozycja:
+    def __init__(self, indeks, nr_linii, kolumna, nazwa_pliku, tekst):
+        self.indeks = indeks
+        self.nr_linii = nr_linii
+        self.kolumna = kolumna
+        self.nazwa_pliku = nazwa_pliku
+        self.tekst = tekst
 
-    def advance(self, current_char):
-        self.idx += 1
-        self.col += 1
+    def przesun(self, aktualny_znak):
+        self.indeks += 1
+        self.kolumna += 1
 
-        if current_char == '\n':
-            self.ln += 1
-            self.col = 0
+        if aktualny_znak == '\n':
+            self.nr_linii += 1
+            self.kolumna = 0
 
         return self
 
-    def copy(self):
-        return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
+    def kopiuj(self):
+        return Pozycja(self.indeks, self.nr_linii, self.kolumna, self.nazwa_pliku, self.tekst)
 
-#######################################
-# TOKENS
-#######################################
 
-TT_INT		= 'INT'
-TT_FLOAT    = 'FLOAT'
-TT_PLUS     = 'PLUS'
-TT_MINUS    = 'MINUS'
-TT_MUL      = 'MUL'
-TT_DIV      = 'DIV'
-TT_LPAREN   = 'LPAREN'
-TT_RPAREN   = 'RPAREN'
+TYP_INT      = 'INT'
+TYP_FLOAT    = 'FLOAT'
+TYP_PLUS     = 'PLUS'
+TYP_MINUS    = 'MINUS'
+TYP_MNOZENIE = 'MNOZENIE'
+TYP_DZIELENIE= 'DZIELENIE'
+TYP_NAWIAS_L= 'NAWIAS_L'
+TYP_NAWIAS_P= 'NAWIAS_P'
 
 class Token:
-    def __init__(self, type_, value=None):
-        self.type = type_
-        self.value = value
+    def __init__(self, typ, wartosc=None):
+        self.typ = typ
+        self.wartosc = wartosc
     
     def __repr__(self):
-        if self.value: return f'{self.type}:{self.value}'
-        return f'{self.type}'
+        return f'{self.typ}:{self.wartosc}' if self.wartosc else f'{self.typ}'
 
-#######################################
-# LEXER
-#######################################
 
-class Lexer:
-    def __init__(self, fn, text):
-        self.fn = fn
-        self.text = text
-        self.pos = Position(-1, 0, -1, fn, text)
-        self.current_char = None
-        self.advance()
+class Lekser:
+    def __init__(self, nazwa_pliku, tekst):
+        self.nazwa_pliku = nazwa_pliku
+        self.tekst = tekst
+        self.pozycja = Pozycja(-1, 0, -1, nazwa_pliku, tekst)
+        self.aktualny_znak = None
+        self.przesun()
     
-    def advance(self):
-        self.pos.advance(self.current_char)
-        self.current_char = self.text[self.pos.idx] if self.pos.idx < len(self.text) else None
+    def przesun(self):
+        self.pozycja.przesun(self.aktualny_znak)
+        self.aktualny_znak = self.tekst[self.pozycja.indeks] if self.pozycja.indeks < len(self.tekst) else None
 
-    def make_tokens(self):
-        tokens = []
+    def generuj_tokeny(self):
+        tokeny = []
 
-        while self.current_char != None:
-            if self.current_char in ' \t':
-                self.advance()
-            elif self.current_char in DIGITS:
-                tokens.append(self.make_number())
-            elif self.current_char == '+':
-                tokens.append(Token(TT_PLUS))
-                self.advance()
-            elif self.current_char == '-':
-                tokens.append(Token(TT_MINUS))
-                self.advance()
-            elif self.current_char == '*':
-                tokens.append(Token(TT_MUL))
-                self.advance()
-            elif self.current_char == '/':
-                tokens.append(Token(TT_DIV))
-                self.advance()
-            elif self.current_char == '(':
-                tokens.append(Token(TT_LPAREN))
-                self.advance()
-            elif self.current_char == ')':
-                tokens.append(Token(TT_RPAREN))
-                self.advance()
+        while self.aktualny_znak is not None:
+            if self.aktualny_znak in ' \t':
+                self.przesun()
+            elif self.aktualny_znak in CYFRY:
+                tokeny.append(self.generuj_liczbe())
+            elif self.aktualny_znak == '+':
+                tokeny.append(Token(TYP_PLUS))
+                self.przesun()
+            elif self.aktualny_znak == '-':
+                tokeny.append(Token(TYP_MINUS))
+                self.przesun()
+            elif self.aktualny_znak == '*':
+                tokeny.append(Token(TYP_MNOZENIE))
+                self.przesun()
+            elif self.aktualny_znak == '/':
+                tokeny.append(Token(TYP_DZIELENIE))
+                self.przesun()
+            elif self.aktualny_znak == '(':
+                tokeny.append(Token(TYP_NAWIAS_L))
+                self.przesun()
+            elif self.aktualny_znak == ')':
+                tokeny.append(Token(TYP_NAWIAS_P))
+                self.przesun()
             else:
-                pos_start = self.pos.copy()
-                char = self.current_char
-                self.advance()
-                return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
+                poczatek_bledu = self.pozycja.kopiuj()
+                znak = self.aktualny_znak
+                self.przesun()
+                return [], NiedozwolonyZnakBlad(poczatek_bledu, self.pozycja, f'"{znak}"')
 
-        return tokens, None
+        return tokeny, None
 
-    def make_number(self):
-        num_str = ''
-        dot_count = 0
+    def generuj_liczbe(self):
+        liczba = ''
+        liczba_kropek = 0
 
-        while self.current_char != None and self.current_char in DIGITS + '.':
-            if self.current_char == '.':
-                if dot_count == 1: break
-                dot_count += 1
-                num_str += '.'
+        while self.aktualny_znak is not None and self.aktualny_znak in CYFRY + '.':
+            if self.aktualny_znak == '.':
+                if liczba_kropek == 1: break
+                liczba_kropek += 1
+                liczba += '.'
             else:
-                num_str += self.current_char
-            self.advance()
+                liczba += self.aktualny_znak
+            self.przesun()
 
-        if dot_count == 0:
-            return Token(TT_INT, int(num_str))
-        else:
-            return Token(TT_FLOAT, float(num_str))
+        return Token(TYP_INT, int(liczba)) if liczba_kropek == 0 else Token(TYP_FLOAT, float(liczba))
 
-#######################################
-# RUN
-#######################################
 
-def run(fn, text):
-    lexer = Lexer(fn, text)
-    tokens, error = lexer.make_tokens()
-
-    return tokens, error
+def uruchom(nazwa_pliku, tekst):
+    lekser = Lekser(nazwa_pliku, tekst)
+    tokeny, blad = lekser.generuj_tokeny()
+    return tokeny, blad

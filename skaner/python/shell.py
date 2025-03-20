@@ -1,8 +1,10 @@
 import basic
 
 while True:
-    text = input('basic > ')
-    result, error = basic.run('<stdin>', text)
+    tekst = input('lexer > ')
+    wynik, blad = basic.uruchom('<stdin>', tekst)
 
-    if error: print(error.as_string())
-    else: print(result)
+    if blad:
+        print(blad.jako_tekst())
+    else:
+        print(wynik)
