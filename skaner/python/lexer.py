@@ -1,10 +1,12 @@
-from typing import List, Dict
+from typing import List
 
 #######################################
 # CONSTANTS
 #######################################
 
 DIGITS = '0123456789'
+LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+LETTERS_DIGITS = LETTERS + DIGITS
 
 #######################################
 # POSITION
@@ -63,7 +65,16 @@ TT_MUL      = 'MUL'
 TT_DIV      = 'DIV'
 TT_LPAREN   = 'LPAREN'
 TT_RPAREN   = 'RPAREN'
-TT_WHITE ='WHITE_CHAR'
+TT_WHITE = 'WHITE_CHAR'
+TT_IDENTIFIER = 'IDENTIFIER'
+TT_KEYWORD = 'KEYWORD'
+TT_TYPE = 'TYPE'
+TT_VAL = 'VALUE'
+TT_EQ = 'EQ'
+
+KEYWORDS = ['if', 'else', 'for', 'while', 'break', 'continue', 'return', 'def'] # 'class'
+TYPES = ['var', 'string', 'int', 'float', 'double', 'boolean', 'char', 'long']
+OTHER_VALUES = ['true', 'false', 'null']
 
 class Token:
     def __init__(self, token_type: str, value: object = None):
@@ -97,6 +108,8 @@ class Lexer:
             if self.peek in {' ', '\t', '\n', '\r'}:
                 tokens.append(Token("TT_WHITE", self.peek))
                 self.advance()
+            elif self.peek in LETTERS:
+                tokens.append(self.make_identifier())
             elif self.peek in DIGITS:
                 tokens.append(self.make_number())
             elif self.peek == '+':
@@ -104,6 +117,9 @@ class Lexer:
                 self.advance()
             elif self.peek == '-':
                 tokens.append(Token("TT_MINUS", self.peek))
+                self.advance()
+            elif self.peek == '=':
+                tokens.append(Token("TT_EQ", self.peek))
                 self.advance()
             elif self.peek == '*':
                 tokens.append(Token("TT_MUL", self.peek))
@@ -139,12 +155,21 @@ class Lexer:
         
         return Token("TT_INT", int(num_str)) if dot_count == 0 else Token("TT_FLOAT", float(num_str))
 
-#######################################
-# RUN
-#######################################
-
-# def run(fn, text):
-#     lexer = Lexer(fn, text)
-#     tokens, error = lexer.make_tokens()
-
-#     return tokens, error
+    def make_identifier(self):
+        str_identifier = ''
+        pos_start = self.pos.copy()
+        
+        while self.peek is not None and self.peek in LETTERS_DIGITS + '_':
+            str_identifier += self.peek
+            self.advance()
+        
+        if str_identifier in KEYWORDS:
+            token_type = 'TT_KEYWORD'
+        elif str_identifier in TYPES:
+            token_type = 'TT_TYPE'
+        elif str_identifier in OTHER_VALUES:
+            token_type = 'TT_VAL'
+        else:
+            token_type = 'TT_IDENTIFIER'    
+        return Token(token_type, str_identifier)
+        

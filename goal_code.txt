@@ -1,0 +1,37 @@
+// w pliku input.txt znajduje się kod który powinien się cały
+// kolorować.
+// w tym pliku znajduje się kod do którego dążymy aby był cały
+// pokolorowany.
+
+int x = 10;
+double y = 5.5;
+string text = "hello";
+boolean isActive = true;
+
+x = x + y - 3 * (y / 2);
+
+if(x > 10){
+    var result = x + y;
+} else {
+    var result = x - y;
+}
+
+for(int i = 0; i < 10; i++){
+    x = x + i;
+}
+
+while(x < 100){
+    x = x + 10
+    if x == 50 {
+        break;
+    }
+    continue;
+}
+
+def add(a, b) {
+    return a + b;
+}
+
+var result = add(x, y);
+boolean isDone = false;
+var emptyValue = null;

@@ -12,7 +12,12 @@ class Highlighter:
             "TT_DIV": "divide",
             "TT_MUL": "mul",
             "TT_LPAREN": "lparen",
-            "TT_RPAREN": "rparen"
+            "TT_RPAREN": "rparen",
+            "TT_KEYWORD": "keyword",
+            "TT_IDENTIFIER" : "identifier",
+            "TT_VAL" : "value",
+            "TT_EQ" : "eq",
+            "TT_TYPE": "type"
         }
 
     def escape_html(self, input_str: str) -> str:
@@ -23,7 +28,7 @@ class Highlighter:
         )
 
     def token_to_html(self, token: Token) -> str:
-        css_class = self.token_styles.get(token.type, "default")
+        css_class = self.token_styles.get(token.type, "default").lower()
         escaped_html = self.escape_html(str(token.value))
         escaped_html = escaped_html.replace("\n", "<br>").replace(" ", "&nbsp;")
         return f'<span class="{css_class.lower()}">{escaped_html}</span>'
@@ -37,11 +42,14 @@ class Highlighter:
             <style>
                 body { font-family: monospace; background-color: #f4f4f4; padding: 20px; }
                 .code-container { background: white; padding: 10px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-                .keyword { color: blue; font-weight: bold; }
                 .plus { color: red; }
-                .number { color: orange; }
+                .number { color: rgb(18, 113, 51); }
                 .float { color: green; }
                 .comment { color: gray; font-style: italic; }
+                .type { color: rgb(229, 160, 10); }
+                .value { color: rgb(184, 46, 179); }
+                .identifier { color: rgb(79, 175, 239); }
+                .keyword { color: blue; font-weight: bold; }
                 .default { color: black; }
             </style>
         </head>

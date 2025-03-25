@@ -1,9 +1,32 @@
-2+3*(76+8/3.23)+ 3*(9-3)
-1 + 3 * (45 + 7 / 2.5) + 2 * (8 - 4)
+int x = 10
+double y = 5.5
+string text = hello
+boolean isActive = true
 
-5 + 4 * (32 + 9 / 3.2) + 3 * (10 - 5)
-8 + 2 * (50 + 6 / 4.8) + 5 * (12 - 6)
+x = x + y - 3 * (y / 2)
+
+if(x  10)
+    var result = x + y
+ else 
+    var result = x - y
 
 
-7 + 3 * (60 + 8 / 3.9) + 4 * (14 - 7)
-9 * (20 + 5 / 2.7) + 6 * (18 - 9)
+for(int i = 0 i  10 i++)
+    x = x + i
+
+
+while(x  100)
+    x = x + 10
+    if x == 50 
+        break
+    
+    continue
+
+
+def add(a b) 
+    return a + b
+
+
+var result = add(x y)
+boolean isDone = false
+var emptyValue = null
