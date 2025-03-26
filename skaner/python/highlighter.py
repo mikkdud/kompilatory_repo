@@ -27,6 +27,11 @@ class Highlighter:
             lexer.TT_L_SQUARE: "square",
             lexer.TT_R_SQUARE: "square",
             lexer.TT_AMPERSAND: "ampersand"
+            "TT_KEYWORD": "keyword",
+            "TT_IDENTIFIER": "identifier",
+            "TT_VAL" : "value",
+            "TT_EQ" : "eq",
+            "TT_TYPE": "type"
         }
 
     def escape_html(self, input_str: str) -> str:
@@ -79,10 +84,12 @@ class Highlighter:
                 .paren { color: purple; }
                 .square { color: sienna; }
                 .curly { color: green; }
+                .type { color: rgb(229, 160, 10); }
+                .value { color: rgb(184, 46, 179); }
+                .identifier { color: rgb(79, 175, 239); }
                 .default { color: black; }
                 .semicolon { color: cyan; }
                 .ampersand { color: red; font-weight: bold; }
-
             </style>
         </head>
         <body>
