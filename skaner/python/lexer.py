@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, Dict
 
 #######################################
@@ -12,13 +13,23 @@ DIGITS = '0123456789'
 
 
 class Position:
+    """
+    Tracks the position of the current character in the input text.
+    Includes index, line, and column numbers.
+    """
+
     def __init__(self, index: int, line: int, column: int, file_name: str):
         self.index = index
         self.line = line
         self.column = column
         self.file_name = file_name
 
-    def advance(self, peek: str):
+    def advance(self, peek: str) -> Position:
+        """
+        Moves the position forward by one character.
+        Resets column if a newline is encountered.
+        """
+
         new_pos = self.copy()
         new_pos.index += 1
         new_pos.column += 1
@@ -27,7 +38,7 @@ class Position:
             new_pos.column = 0
         return new_pos
 
-    def copy(self):
+    def copy(self) -> Position:
         return Position(self.index, self.line, self.column, self.file_name)
 
 #######################################
@@ -55,17 +66,30 @@ class IllegalCharError(Exception):
 # TOKENS
 #######################################
 
-TT_INT		= 'INT'
-TT_FLOAT    = 'FLOAT'
-TT_PLUS     = 'PLUS'
-TT_MINUS    = 'MINUS'
-TT_MUL      = 'MUL'
-TT_DIV      = 'DIV'
-TT_LPAREN   = 'LPAREN'
-TT_RPAREN   = 'RPAREN'
-TT_WHITE ='WHITE_CHAR'
+TT_INT         = 'INT'
+TT_FLOAT       = 'FLOAT'
+TT_PLUS        = 'PLUS'
+TT_MINUS       = 'MINUS'
+TT_MUL         = 'MUL'
+TT_DIV         = 'DIV'
+TT_LPAREN      = 'LPAREN'
+TT_RPAREN      = 'RPAREN'
+TT_WHITE       = 'WHITE_CHAR'
+TT_LESS        = 'LESS'
+TT_GREATER     = 'GREATER'
+TT_L_CURLY     = 'L_CURLY_BRACE'
+TT_R_CURLY     = 'R_CURLY_BRACE'
+TT_SEMICOLON   = 'SEMICOLON'
+TT_L_SQUARE    = 'L_SQUARE_BRACKET'
+TT_R_SQUARE    = 'R_SQUARE_BRACKET'
+TT_AMPERSAND   = 'AMPERSAND'
 
 class Token:
+    """
+    Represents a single token with a type and optional value.
+    For example: INT:3, PLUS:'+', etc.
+    """
+
     def __init__(self, token_type: str, value: object = None):
         self.type = token_type
         self.value = value
@@ -79,43 +103,82 @@ class Token:
 
 
 class Lexer:
+    """
+    Scans input text and converts it into a list of tokens.
+    Handles numbers, operators, parentheses, and special characters.
+    """
+
     def __init__(self, text: str, file_name: str):
         self.file_name = file_name
         self.text = text
         self.pos = Position(-1, 0, -1, file_name)
-        self.peek = text[0] if text else None
+        self.peek = text[0] if text else None  # current character
         self.advance()
 
     def advance(self):
+        """
+        Moves to the next character in the input text.
+        """
+
         self.pos = self.pos.advance(self.peek)
         self.peek = self.text[self.pos.index] if self.pos.index < len(self.text) else None
 
     def make_tokens(self) -> List[Token]:
+        """
+        Main tokenization loop.
+        Returns a list of tokens found in the input text.
+        Raises IllegalCharError if unexpected characters are found.
+        """
+
         tokens = []
         
         while self.peek is not None:
             if self.peek in {' ', '\t', '\n', '\r'}:
-                tokens.append(Token("TT_WHITE", self.peek))
+                tokens.append(Token(TT_WHITE, self.peek))
                 self.advance()
             elif self.peek in DIGITS:
                 tokens.append(self.make_number())
             elif self.peek == '+':
-                tokens.append(Token("TT_PLUS", self.peek))
+                tokens.append(Token(TT_PLUS, self.peek))
                 self.advance()
             elif self.peek == '-':
-                tokens.append(Token("TT_MINUS", self.peek))
+                tokens.append(Token(TT_MINUS, self.peek))
                 self.advance()
             elif self.peek == '*':
-                tokens.append(Token("TT_MUL", self.peek))
+                tokens.append(Token(TT_MUL, self.peek))
                 self.advance()
             elif self.peek == '/':
-                tokens.append(Token("TT_DIV", self.peek))
+                tokens.append(Token(TT_DIV, self.peek))
                 self.advance()
             elif self.peek == '(':
-                tokens.append(Token("TT_LPAREN", self.peek))
+                tokens.append(Token(TT_LPAREN, self.peek))
                 self.advance()
             elif self.peek == ')':
-                tokens.append(Token("TT_RPAREN", self.peek))
+                tokens.append(Token(TT_RPAREN, self.peek))
+                self.advance()
+            elif self.peek == '<':
+                tokens.append(Token(TT_LESS, self.peek))
+                self.advance()
+            elif self.peek == '>':
+                tokens.append(Token(TT_GREATER, self.peek))
+                self.advance()
+            elif self.peek == '{':
+                tokens.append(Token(TT_L_CURLY, self.peek))
+                self.advance()
+            elif self.peek == '}':
+                tokens.append(Token(TT_R_CURLY, self.peek))
+                self.advance()
+            elif self.peek == ';':
+                tokens.append(Token(TT_SEMICOLON, self.peek))
+                self.advance()
+            elif self.peek == '[':
+                tokens.append(Token(TT_L_SQUARE, self.peek))
+                self.advance()
+            elif self.peek == ']':
+                tokens.append(Token(TT_R_SQUARE, self.peek))
+                self.advance()
+            elif self.peek == '&':
+                tokens.append(Token(TT_AMPERSAND, self.peek))
                 self.advance()
             else:
                 pos_start = self.pos.copy()
@@ -126,6 +189,11 @@ class Lexer:
         return tokens
 
     def make_number(self) -> Token:
+        """
+        Parses a sequence of digits into an INT or FLOAT token.
+        Supports decimal numbers with a single dot.
+        """
+        
         num_str = ""
         dot_count = 0
 
@@ -137,7 +205,7 @@ class Lexer:
             num_str += self.peek
             self.advance()
         
-        return Token("TT_INT", int(num_str)) if dot_count == 0 else Token("TT_FLOAT", float(num_str))
+        return Token(TT_INT, int(num_str)) if dot_count == 0 else Token(TT_FLOAT, float(num_str))
 
 #######################################
 # RUN
