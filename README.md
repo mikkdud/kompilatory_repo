@@ -11,3 +11,4 @@
 6. Go to skaner/python: `cd skaner/python`
 7. Run `python __main__.py input.txt`
 8. To deactivate venv run `deactivate`
+[tutorial](https://www.youtube.com/watch?v=xvFZjo5PgG0)
