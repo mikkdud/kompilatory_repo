@@ -42,3 +42,7 @@
 6. Przejdź do skaner/python: `cd skaner/python`
 7. Użyj komendy `python __main__.py input.txt`
 8. Aby dezaktywować wirtualne środowisko użyj komendy `deactivate`
+
+
+## Diagram 
+![Diagram przejść](diagram.png)
