@@ -1,6 +1,6 @@
 # kompilatory_repo
 
-[demo](https://www.youtube.com/watch?v=xvFZjo5PgG0)
+[demo](https://mikkdud.github.io/kompilatory_repo/)
 
 ## How to run?
 1. Clone repo

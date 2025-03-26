@@ -29,7 +29,7 @@ def main():
     html_code = highlighter.generate_html()
     
     try:
-        with open("output.html", "w", encoding='utf-8') as writer:
+        with open("index.html", "w", encoding='utf-8') as writer:
             writer.write(html_code)
     except IOError as e:
         print(f"Błąd zapisu pliku: {e}")
