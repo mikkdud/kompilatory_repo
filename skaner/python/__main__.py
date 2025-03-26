@@ -21,7 +21,6 @@ def main():
     try:
         tokens = lexer.make_tokens()
         token_list_str = f"[{', '.join(map(str, tokens))}]"
-        print(token_list_str)
     except IllegalCharError as e:
         print(e)
         return
