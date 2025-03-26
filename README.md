@@ -1,8 +1,8 @@
 # kompilatory_repo
 
-[demo](https://mikkdud.github.io/kompilatory_repo/)
+[wynik w html](https://mikkdud.github.io/kompilatory_repo/)
 
-## Spis tokenów rozpoznawanych przez program.
+## Spis tokenów rozpoznawanych przez program 📜
 
 | Token | Wartość |
 | ----- | ----- |
@@ -31,7 +31,7 @@
 | TT\_QUOTED\_STRING | łańcuch znaków w cudzysłowie, np: “hello” |
 | TT\_COMMA | ‘,’ |
 
-## Jak uruchomić?
+## Jak uruchomić? 💻
 1. Sklonuj repozytorium
 2. Przejdź do folderu projektu 
 3. Stwórz wirtualne środowisko:
@@ -44,5 +44,5 @@
 8. Aby dezaktywować wirtualne środowisko użyj komendy `deactivate`
 
 
-## Diagram 
+## Diagram 📈
 ![Diagram przejść](diagram.png)
