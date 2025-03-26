@@ -24,14 +24,15 @@ class Highlighter:
             lexer.TT_L_CURLY: "curly",
             lexer.TT_R_CURLY: "curly",
             lexer.TT_SEMICOLON: "semicolon",
+            lexer.TT_COMMA: "semicolon",
             lexer.TT_L_SQUARE: "square",
             lexer.TT_R_SQUARE: "square",
-            lexer.TT_AMPERSAND: "ampersand"
-            "TT_KEYWORD": "keyword",
-            "TT_IDENTIFIER": "identifier",
-            "TT_VAL" : "value",
-            "TT_EQ" : "eq",
-            "TT_TYPE": "type"
+            lexer.TT_AMPERSAND: "ampersand",
+            lexer.TT_KEYWORD: "keyword",
+            lexer.TT_IDENTIFIER: "identifier",
+            lexer.TT_VAL : "value",
+            lexer.TT_TYPE: "type",
+            lexer.TT_QUOTED_STRING: "qstring"
         }
 
     def escape_html(self, input_str: str) -> str:
@@ -79,7 +80,7 @@ class Highlighter:
                 .code-container { background: white; padding: 10px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
                 .keyword { color: blue; font-weight: bold; }
                 .sign { color: pink; }
-                .number { color: dodgerblue; }
+                .number { color: rgb(46, 5, 122); }
                 .comment { color: gray; font-style: italic; }
                 .paren { color: purple; }
                 .square { color: sienna; }
@@ -90,6 +91,7 @@ class Highlighter:
                 .default { color: black; }
                 .semicolon { color: cyan; }
                 .ampersand { color: red; font-weight: bold; }
+                .qstring { color: rgb(39, 233, 28); }
             </style>
         </head>
         <body>

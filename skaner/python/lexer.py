@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Dict
+from typing import List
 
 #######################################
 # CONSTANTS
@@ -61,7 +61,7 @@ class Error(Exception):
 
 class IllegalCharError(Exception):
     def __init__(self, pos_start: Position, pos_end: Position, details: str):
-        super().__init__(f"Illegal Character: {details} at {pos_start} - {pos_end}")
+        super().__init__(f"Illegal Character: {details} at {pos_start.line} - {pos_start.column}")
 
 
 #######################################
@@ -89,6 +89,8 @@ TT_KEYWORD     = 'KEYWORD'
 TT_TYPE        = 'TYPE'
 TT_VAL         = 'VALUE'
 TT_EQ          = 'EQ'
+TT_QUOTED_STRING = 'QSTRING'
+TT_COMMA = 'comma'
 
 KEYWORDS = ['if', 'else', 'for', 'while', 'break', 'continue', 'return', 'def'] # 'class'
 TYPES = ['var', 'string', 'int', 'float', 'double', 'boolean', 'char', 'long']
@@ -157,7 +159,7 @@ class Lexer:
                 tokens.append(Token(TT_MINUS, self.peek))
                 self.advance()
             elif self.peek == '=':
-                tokens.append(Token("TT_EQ", self.peek))
+                tokens.append(Token(TT_EQ, self.peek))
                 self.advance()
             elif self.peek == '*':
                 tokens.append(Token(TT_MUL, self.peek))
@@ -186,6 +188,9 @@ class Lexer:
             elif self.peek == ';':
                 tokens.append(Token(TT_SEMICOLON, self.peek))
                 self.advance()
+            elif self.peek == ',':
+                tokens.append(Token(TT_COMMA, self.peek))
+                self.advance()
             elif self.peek == '[':
                 tokens.append(Token(TT_L_SQUARE, self.peek))
                 self.advance()
@@ -195,6 +200,8 @@ class Lexer:
             elif self.peek == '&':
                 tokens.append(Token(TT_AMPERSAND, self.peek))
                 self.advance()
+            elif self.peek == '"':
+                tokens.append(self.make_string())
             else:
                 pos_start = self.pos.copy()
                 ch = self.peek
@@ -224,19 +231,31 @@ class Lexer:
 
     def make_identifier(self):
         str_identifier = ''
-        pos_start = self.pos.copy()
         
         while self.peek is not None and self.peek in LETTERS_DIGITS + '_':
             str_identifier += self.peek
             self.advance()
         
         if str_identifier in KEYWORDS:
-            token_type = 'TT_KEYWORD'
+            token_type = TT_KEYWORD
         elif str_identifier in TYPES:
-            token_type = 'TT_TYPE'
+            token_type = TT_TYPE
         elif str_identifier in OTHER_VALUES:
-            token_type = 'TT_VAL'
+            token_type = TT_VAL
         else:
-            token_type = 'TT_IDENTIFIER'    
+            token_type = TT_IDENTIFIER    
         return Token(token_type, str_identifier)
+    
+    def make_string(self):
+        quoted_string = ''
+        quotation_mark_count = 0
+        while self.peek is not None and self.peek in LETTERS_DIGITS + '_&"':
+            if self.peek == '"':
+                quotation_mark_count += 1
+            quoted_string += self.peek
+            self.advance()
+            if quotation_mark_count > 1:
+                break
+        return Token(TT_QUOTED_STRING, quoted_string)
+                        
         

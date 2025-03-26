@@ -1,31 +1,32 @@
-int x = 10
-double y = 5.5
-string text = hello
-boolean isActive = true
+int x = 10;
+double y = 5.5;
+string text = "hello";
+boolean isActive = true;
 
-x = x + y - 3 * (y / 2)
+x = x + y - 3 * (y / 2);
 
-if(x  10)
-    var result = x + y
- else 
-    var result = x - y
+if(x > 10){
+    var result = x + y;
+} else {
+    var result = x - y;
+}
 
-for(int i = 0 i  10 i++)
-    x = x + i
+for(int i = 0; i < 10; i++){
+    x = x + i;
+}
 
-
-while(x  100)
+while(x < 100){
     x = x + 10
-    if x == 50 
-        break
-    
-    continue
+    if x == 50 {
+        break;
+    }
+    continue;
+}
 
+def add(a, b) {
+    return a + b;
+}
 
-def add(a b) 
-    return a + b
-
-
-var result = add(x y)
-boolean isDone = false
-var emptyValue = null
+var result = add(x, y);
+boolean isDone = false;
+var emptyValue = null;
